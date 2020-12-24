@@ -11,26 +11,53 @@ struct Input: CustomStringConvertible {
     static let zero: Input = Input()
     
     
-    private(set) var decimal = Decimal()
+//    var decimal: Decimal {
+//
+//        let exponent = nonInteger
+//
+//        return Decimal()
+//    }
     
-    private var integer: Int = 0
-    private var nonInteger: Int? {
-        didSet {
-            if nonInteger == nil {
-                isDecimal = false
-            } else {
-                isDecimal = true
-            }
-        }
+    
+    private var stringSign: String {
+        return isNegative ? "-" : ""
     }
     
-    private var isDecimal: Bool = false
-    var isDecimalMode = false
+    private var stringInteger = "0"
+    private var stringNonInteger: String?
     
+    private var integer: Int = 0
+    private var nonInteger: Int?
+    private(set) var isDecimalMode = false
+    private var isNegative = false
+    
+    
+    init() {}
+    
+    init(decimal: Decimal) {
+        
+        if decimal.sign == .minus {
+            isNegative = true
+        }
+        
+        let exponent = decimal.exponent
+        if exponent < 0 {
+            isDecimalMode = true
+        }
+        
+        let integer = decimal
+        
+    }
 
     
     /// Counts how many usable digits are in the input
     func countDigits() -> Int {
+        
+        
+        let integerCount = stringInteger.count
+        let nonIntegerCount = stringNonInteger?.count ?? 0
+        
+        
         var digitCount = String(integer).count
         if let nonInteger = nonInteger {
             digitCount += String(nonInteger).count
@@ -39,7 +66,7 @@ struct Input: CustomStringConvertible {
             digitCount -= 1
         }
     
-        return digitCount
+        return integerCount + nonIntegerCount
     }
     
     
@@ -47,34 +74,46 @@ struct Input: CustomStringConvertible {
     /// - parameters:
     ///     - integer: integer to add to the integer part of the Input
     mutating func append(integer: Int) {
-        decimal = decimal * 10 + Decimal(integer)
-        
         self.integer = self.integer * 10 + integer
+        
+        if stringInteger == "0" && integer != 0 {
+            stringInteger = "\(integer)"
+        } else if stringInteger != "0"{
+            stringInteger.append(String(integer))
+        }
     }
     
     /// Appends an intiger to the end of the non-integer part of the Input
     /// - parameters:
     ///     - nonInteger: integer to add to the non-integer part of the Input
     mutating func append(nonInteger: Int) {
-        
-        let exponent = decimal.exponent
-        let toAdd = Decimal(sign: decimal.sign, exponent: exponent - 1, significand: Decimal(nonInteger))
-        decimal += toAdd
-        print(decimal)
-        
         self.nonInteger = (self.nonInteger ?? 0) * 10 + nonInteger
+        
+        stringNonInteger = (stringNonInteger ?? "") + String(nonInteger)
     }
     
     mutating func negate() {
-        integer = -integer
-        decimal.negate()
+        isNegative = !isNegative
+    }
+    
+    mutating func enterDecimalMode() {
+        isDecimalMode = true
     }
     
     
     // MARK: - Arithmetical Operations
     
-    func add(input: Input) -> Input {
-        return decimal + input.decimal
+//    func add(input: Input) -> Input {
+//        return decimal + input.decimal
+//    }
+    
+    
+    func percent() -> Input {
+        
+        
+        
+        
+        
     }
     
     
@@ -87,18 +126,35 @@ struct Input: CustomStringConvertible {
         
         
         // TODO: - Check if the result is longer than 9 digits
+        var result = ""
         
+        if isNegative {
+            result.append("-")
+        }
         
-        var stringInput = String(integer)
+        result.append(stringInteger)
         
         if isDecimalMode {
-            stringInput += ","
+            result.append(",")
+            result.append(stringNonInteger ?? "")
         }
         
-        if let nonInteger = nonInteger {
-            stringInput += "\(nonInteger)"
-        }
         
-        return stringInput
+        return result
+    }
+}
+
+
+extension String {
+    
+    func countWithoutTrailingZeros() -> Int {
+        
+        var tempString = self
+        
+        while true {
+            if tempString.last == "0" {
+                tempString.dropLast()
+            }
+        }
     }
 }

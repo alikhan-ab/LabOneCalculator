@@ -7,12 +7,36 @@
 
 import SnapKit
 
-class OperationButton: UIButton {
+class RoundButton: UIButton {
+    override func layoutSubviews() {
+        super.layoutSubviews()
+        layer.cornerRadius = bounds.height / 2
+    }
+}
+
+class OperationButton: RoundButton {
     override var isSelected: Bool {
         didSet {
             backgroundColor = isSelected ? ViewController.pureWhite : ViewController.orange
         }
     }
+}
+
+class MethodButton: RoundButton {
+    override var isHighlighted: Bool {
+        didSet {
+            backgroundColor = isHighlighted ? ViewController.highlightedLightGray : ViewController.lightGray
+        }
+    }
+}
+
+class InputButton: RoundButton {
+    override var isHighlighted: Bool {
+        didSet {
+            backgroundColor = isHighlighted ? ViewController.highlightedDarkGray : ViewController.darkGray
+        }
+    }
+    
 }
 
 class ViewController: UIViewController {
@@ -43,28 +67,27 @@ class ViewController: UIViewController {
     static let numberWhite = #colorLiteral(red: 0.9647058824, green: 0.9647058824, blue: 0.9647058824, alpha: 1)
     static let symbolBlack = #colorLiteral(red: 0.09803921569, green: 0.09803921569, blue: 0.09803921569, alpha: 1)
     static let darkGray = #colorLiteral(red: 0.2, green: 0.2, blue: 0.2, alpha: 1)
+    static let highlightedDarkGray = #colorLiteral(red: 0.4756349325, green: 0.4756467342, blue: 0.4756404161, alpha: 1)
     static let lightGray = #colorLiteral(red: 0.6196078431, green: 0.6196078431, blue: 0.6196078431, alpha: 1)
+    static let highlightedLightGray = #colorLiteral(red: 0.921431005, green: 0.9214526415, blue: 0.9214410186, alpha: 1)
     static let orange = #colorLiteral(red: 0.9882352941, green: 0.6235294118, blue: 0.168627451, alpha: 1)
     static let pureWhite = #colorLiteral(red: 1.0, green: 1.0, blue: 1.0, alpha: 1.0)
 
 
     // MARK: - UI Element properties
     
-    
-    
     private let resultLabel: UILabel = {
         let label = UILabel()
         label.textColor = .white
         label.textAlignment = .right
         label.font = .systemFont(ofSize: 100, weight: .thin)
-        
         label.text = "0"
         return label
     }()
     
     // Number buttons
-    private var numberButtons: [UIButton] = []
-    private let periodButton = makeButton(for: ",", selectedTitle: nil, backgroundColor: darkGray, titleColorForNormal: numberWhite, titleColorForSelected: nil, cornerRadius: 35)
+    private var numberButtons: [InputButton] = []
+    private let periodButton = makeInputButton(for: ",")
     
     // Operation buttons
     private let divisionButton = makeOperationButton(for: "÷")
@@ -74,40 +97,43 @@ class ViewController: UIViewController {
     private let resultButton = makeOperationButton(for: "=")
     
     // Additional method buttons
-    private let cancelButton = makeButton(for: "AC", selectedTitle: "C", backgroundColor: lightGray, titleColorForNormal: symbolBlack, titleColorForSelected: nil, cornerRadius: 35)
-    private let plusMinusButton = makeButton(for: "+/-", selectedTitle: nil, backgroundColor: lightGray, titleColorForNormal: symbolBlack, titleColorForSelected: nil, cornerRadius: 35)
-    private let percentButton = makeButton(for: "%", selectedTitle: nil, backgroundColor: lightGray, titleColorForNormal: symbolBlack,titleColorForSelected: nil, cornerRadius: 35)
+    private let cancelButton = makeMethodButton(for: "AC", selectedTitle: "C")
+    private let plusMinusButton = makeMethodButton(for: "+/-", selectedTitle: nil)
+    private let percentButton = makeMethodButton(for: "%", selectedTitle: nil)
+    
     
     
     
     private let mainStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.distribution = .equalSpacing
+        stackView.distribution = .fillProportionally
         stackView.axis = .vertical
+        stackView.spacing = 12
         return stackView
     }()
     
+    
+    
+    // MARK: - Class Methods
 
     override func viewDidLoad() {
         super.viewDidLoad()
         view.backgroundColor = .black
         layoutUI()
+        configureUserInteraction()
     }
     
     // MARK: - Configure Layout
-    // TODO: - Make the zero be twice as much as two buttons
-    // TODO: - Make scaling of spacings for different screen sizes
     
     private func layoutUI() {
         createNumberButtons()
         configureResultLabel()
         configureButtonsStack()
-        
     }
     
     private func createNumberButtons() {
         for number in 0...9 {
-            let button = ViewController.makeButton(for: "\(number)", selectedTitle: nil, backgroundColor: ViewController.darkGray, titleColorForNormal: ViewController.numberWhite, titleColorForSelected: nil, cornerRadius: 35)
+            let button = ViewController.makeInputButton(for: "\(number)")
             numberButtons.append(button)
         }
     }
@@ -131,146 +157,128 @@ class ViewController: UIViewController {
         view.addSubview(mainStackView)
         mainStackView.snp.makeConstraints{
             $0.top.equalTo(resultLabel.snp.bottom).offset(10)
-            
-//            $0.right.equalToSuperview().offset(-10)
-//            $0.left.equalToSuperview().offset(10)
-            
-            $0.left.equalTo(view.safeAreaLayoutGuide.snp.left).offset(10)
-            $0.right.equalTo(view.safeAreaLayoutGuide.snp.right).offset(-10)
+        
+            $0.left.equalTo(view.safeAreaLayoutGuide.snp.left).offset(20)
+            $0.right.equalTo(view.safeAreaLayoutGuide.snp.right).offset(-20)
 
-            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-10)
+            $0.bottom.equalTo(view.safeAreaLayoutGuide.snp.bottom).offset(-20)
         }
         
         
-        
-        // First row
-        
-        cancelButton.addTarget(self, action: #selector(methodButtonDidPress(_:)), for: .touchUpInside)
-        plusMinusButton.addTarget(self, action: #selector(methodButtonDidPress(_:)), for: .touchUpInside)
-        percentButton.addTarget(self, action: #selector(methodButtonDidPress(_:)), for: .touchUpInside)
-        divisionButton.addTarget(self, action: #selector(operationButtonDidPress(_:)), for: .touchUpInside)
-        
-        cancelButton.snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        plusMinusButton.snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        percentButton.snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        divisionButton.snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        
         let firstRowStack = makeRowStackView(arrangedSubviews: [cancelButton, plusMinusButton, percentButton, divisionButton])
         
-        
-        // Second row
-        
-        numberButtons[7].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        numberButtons[8].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        numberButtons[9].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        multiplicationButton.addTarget(self, action: #selector(operationButtonDidPress(_:)), for: .touchUpInside)
-        
-        
-        numberButtons[7].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        numberButtons[8].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        numberButtons[9].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        multiplicationButton.snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        
         let secondRowStack = makeRowStackView(arrangedSubviews: [numberButtons[7], numberButtons[8], numberButtons[9], multiplicationButton])
-//        secondRowStack.translatesAutoresizingMaskIntoConstraints = false
-        
-        // Third row
-        
-        numberButtons[4].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        numberButtons[5].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        numberButtons[6].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        subtracktionButton.addTarget(self, action: #selector(operationButtonDidPress(_:)), for: .touchUpInside)
-        
-        
-        numberButtons[4].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        numberButtons[5].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        numberButtons[6].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        subtracktionButton.snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
         
         let thirdRowStack = makeRowStackView(arrangedSubviews: [numberButtons[4], numberButtons[5], numberButtons[6], subtracktionButton])
-        
-        
-        // Fourth row
-        
-        numberButtons[1].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        numberButtons[2].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        numberButtons[3].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        additionButton.addTarget(self, action: #selector(operationButtonDidPress(_:)), for: .touchUpInside)
-        
-        
-        numberButtons[1].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        numberButtons[2].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        numberButtons[3].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        additionButton.snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        
+
         let fourthRowStack = makeRowStackView(arrangedSubviews: [numberButtons[1], numberButtons[2], numberButtons[3], additionButton])
         
-        
-        // Fifth row
-        
-        numberButtons[0].addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        periodButton.addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
-        resultButton.addTarget(self, action: #selector(operationButtonDidPress(_:)), for: .touchUpInside)
-        
-        numberButtons[0].snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        periodButton.snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        resultButton.snp.makeConstraints({
-            $0.size.equalTo(70)
-        })
-        
-        let fifthRowStack = makeRowStackView(arrangedSubviews: [numberButtons[0], periodButton, resultButton])
+        let fifthRowRightStack = makeRowStackView(arrangedSubviews: [periodButton, resultButton])
+        let fifthRowStack = makeRowStackView(arrangedSubviews: [numberButtons[0], fifthRowRightStack])
         
 
-
-        
-        
         mainStackView.addArrangedSubview(firstRowStack)
         mainStackView.addArrangedSubview(secondRowStack)
         mainStackView.addArrangedSubview(thirdRowStack)
         mainStackView.addArrangedSubview(fourthRowStack)
         mainStackView.addArrangedSubview(fifthRowStack)
         
+       
+        // Buttons constraints
+        // First row
+        cancelButton.snp.makeConstraints({
+            $0.height.equalTo(cancelButton.snp.width)
+        })
+        plusMinusButton.snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        percentButton.snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        divisionButton.snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        
+        // Second row
+        numberButtons[7].snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        numberButtons[8].snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        numberButtons[9].snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        multiplicationButton.snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        
+        // Third row
+        numberButtons[4].snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        numberButtons[5].snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        numberButtons[6].snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        subtracktionButton.snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        
+        // Forth row
+        numberButtons[1].snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        numberButtons[2].snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        numberButtons[3].snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        additionButton.snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        
+        // Fifth row
+        periodButton.snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        resultButton.snp.makeConstraints({
+            $0.size.equalTo(cancelButton.snp.size)
+        })
+        
+        // Zero button
+        numberButtons[0].snp.makeConstraints({
+            $0.height.equalTo(cancelButton.snp.height)
+        })
+        
         
     }
     
 
     // MARK: - User interaction
+    
+    private func configureUserInteraction() {
+        for button in [cancelButton, plusMinusButton, percentButton] {
+            button.addTarget(self, action: #selector(methodButtonDidPress(_:)), for: .touchUpInside)
+        }
+        
+        for button in numberButtons {
+            button.addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
+        }
+        periodButton.addTarget(self, action: #selector(inputButtonDidPress(_:)), for: .touchUpInside)
+        
+        for button in [divisionButton, multiplicationButton, subtracktionButton, additionButton, resultButton] {
+            button.addTarget(self, action: #selector(operationButtonDidPress(_:)), for: .touchUpInside)
+        }
+        
+        cancelButton.addTarget(self, action: #selector(methodButtonDidPress(_:)), for: .touchUpInside)
+        plusMinusButton.addTarget(self, action: #selector(methodButtonDidPress(_:)), for: .touchUpInside)
+        percentButton.addTarget(self, action: #selector(methodButtonDidPress(_:)), for: .touchUpInside)
+        divisionButton.addTarget(self, action: #selector(operationButtonDidPress(_:)), for: .touchUpInside)
+    }
     
     
     @objc private func methodButtonDidPress(_ sender : UIButton) {
@@ -292,8 +300,18 @@ class ViewController: UIViewController {
             }
             
         case plusMinusButton:
-            currentInput?.negate()
+            
+            if currentInput != nil {
+                currentInput?.negate()
+            } else {
+                currentInput = .zero
+                didUserEnterInput = true
+                currentInput?.negate()
+            }
+            
         case percentButton:
+            
+            currentInput = currentInput.
             
             break;
         default:
@@ -360,7 +378,7 @@ class ViewController: UIViewController {
         case periodButton:
             if !isDecimal {
                 isDecimal = true
-                currentInput?.isDecimalMode = true
+                currentInput?.enterDecimalMode()
             }
             
         default:
@@ -414,40 +432,43 @@ class ViewController: UIViewController {
         button.setTitle(operation, for: .normal)
         button.setTitleColor(pureWhite, for: .normal)
         button.setTitleColor(orange, for: .selected)
-        button.layer.cornerRadius = 35
-        
-        
         return button
     }
     
     
-    private static func makeButton(for title: String, selectedTitle: String?, backgroundColor: UIColor, titleColorForNormal: UIColor, titleColorForSelected: UIColor?, cornerRadius: CGFloat) -> UIButton {
-        let button = UIButton()
+    private static func makeInputButton(for title: String) -> InputButton {
+        let button = InputButton()
+        button.backgroundColor = darkGray
+        button.setTitle(title, for: .normal)
+        button.setTitleColor(pureWhite, for: .normal)
+        return button
+    }
+    
+    private static func makeMethodButton(for title: String, selectedTitle: String?) -> MethodButton {
+        let button = MethodButton()
+        button.backgroundColor = lightGray
+        button.setTitle(title, for: .normal)
+        button.setTitle(selectedTitle, for: .selected)
+        button.setTitleColor(symbolBlack, for: .normal)
+        return button
+    }
+    
+    private static func makeButton(for title: String, selectedTitle: String?, backgroundColor: UIColor, titleColorForNormal: UIColor, titleColorForSelected: UIColor?) -> RoundButton {
+        let button = RoundButton()
         button.backgroundColor = backgroundColor
         button.setTitle(title, for: .normal)
         button.setTitle(selectedTitle, for: .selected)
         button.setTitleColor(titleColorForNormal, for: .normal)
         button.setTitleColor(titleColorForSelected, for: .selected)
-        button.layer.cornerRadius = cornerRadius
-        button.clipsToBounds = true
         return button
     }
         
     private func makeRowStackView(arrangedSubviews: [UIView]) -> UIStackView {
         let stackView = UIStackView(arrangedSubviews: arrangedSubviews)
         stackView.axis = .horizontal
-        stackView.distribution = .equalSpacing
+        stackView.distribution = .fillProportionally
+        stackView.spacing = 12
         return stackView
-    }
-    
-    
-    //
-    
-    private func isEnoughPlaceForInput() -> Bool {
-        
-        guard let digitsCount = currentInput?.countDigits() else { return true }
-        
-        return digitsCount == 9 ? false : true
     }
     
     private func displayCurrentInput() {
@@ -457,5 +478,14 @@ class ViewController: UIViewController {
             resultLabel.text = "0"
         }
     }
+    
+    
+    
+    // MARK: -
+    private func isEnoughPlaceForInput() -> Bool {
+        
+        guard let digitsCount = currentInput?.countDigits() else { return true }
+        
+        return digitsCount == 9 ? false : true
+    }
 }
-
