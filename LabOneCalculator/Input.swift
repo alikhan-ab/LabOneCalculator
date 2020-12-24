@@ -10,15 +10,6 @@ struct Input: CustomStringConvertible {
     
     static let zero: Input = Input()
     
-    
-//    var decimal: Decimal {
-//
-//        let exponent = nonInteger
-//
-//        return Decimal()
-//    }
-    
-    
     private var stringSign: String {
         return isNegative ? "-" : ""
     }
@@ -30,6 +21,8 @@ struct Input: CustomStringConvertible {
     private var nonInteger: Int?
     private(set) var isDecimalMode = false
     private var isNegative = false
+    
+    private var decimal: Decimal?
     
     
     init() {}
@@ -45,7 +38,7 @@ struct Input: CustomStringConvertible {
             isDecimalMode = true
         }
         
-        let integer = decimal
+        let significand = decimal.significand
         
     }
 
@@ -100,6 +93,20 @@ struct Input: CustomStringConvertible {
         isDecimalMode = true
     }
     
+    mutating func punchInDecimal() {
+        let integer = Int(stringInteger)!
+        let nonInteger = Int(stringNonInteger ?? "0" )!
+        
+        var exponent = stringNonInteger?.count ?? 0
+        let significand = integer * Int(pow(10.0, Double(exponent))) + nonInteger
+        let sign: FloatingPointSign = isNegative ? .minus : .plus
+        
+        exponent.negate()
+        decimal = Decimal(sign: sign, exponent: exponent, significand: Decimal(significand))
+        
+        print(decimal)
+    }
+    
     
     // MARK: - Arithmetical Operations
     
@@ -108,13 +115,13 @@ struct Input: CustomStringConvertible {
 //    }
     
     
-    func percent() -> Input {
-        
-        
-        
-        
-        
-    }
+//    func percent() -> Input {
+//        
+//        
+//        
+//        
+//        
+//    }
     
     
     

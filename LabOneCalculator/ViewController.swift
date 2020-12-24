@@ -311,7 +311,6 @@ class ViewController: UIViewController {
             
         case percentButton:
             
-            currentInput = currentInput.
             
             break;
         default:
