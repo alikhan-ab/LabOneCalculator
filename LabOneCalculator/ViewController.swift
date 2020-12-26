@@ -17,7 +17,21 @@ class RoundButton: UIButton {
 class OperationButton: RoundButton {
     override var isSelected: Bool {
         didSet {
-            backgroundColor = isSelected ? ViewController.pureWhite : ViewController.orange
+            backgroundColor = isSelected ? Colors.operationButtonSelectedColor : Colors.operationButtonNormalColor
+        }
+    }
+    
+    override var isHighlighted: Bool {
+        didSet {
+            if isSelected {
+                backgroundColor = isHighlighted ? Colors.operationButtonSelectedHighlightedColor : Colors.operationButtonNormalHighlightedColor
+                setTitleColor(Colors.operationButtonTitleSelectedHighlightedColor, for: .highlighted)
+                
+            } else {
+                backgroundColor = isHighlighted ? Colors.operationButtonNormalHighlightedColor : Colors.operationButtonNormalColor
+                setTitleColor(Colors.operationButtonTitleHighlightedColor, for: .highlighted)
+            }
+            
         }
     }
 }
@@ -25,7 +39,7 @@ class OperationButton: RoundButton {
 class MethodButton: RoundButton {
     override var isHighlighted: Bool {
         didSet {
-            backgroundColor = isHighlighted ? ViewController.highlightedLightGray : ViewController.lightGray
+            backgroundColor = isHighlighted ? Colors.methodButtonHighlightedColor : Colors.methodButtonNormalColor
         }
     }
 }
@@ -33,7 +47,7 @@ class MethodButton: RoundButton {
 class InputButton: RoundButton {
     override var isHighlighted: Bool {
         didSet {
-            backgroundColor = isHighlighted ? ViewController.highlightedDarkGray : ViewController.darkGray
+            backgroundColor = isHighlighted ? Colors.inputButtonHighlightedColor : Colors.inputButtonNormalColor
         }
     }
     
@@ -126,12 +140,12 @@ class ViewController: UIViewController {
     // MARK: - Configure Layout
     
     private func layoutUI() {
-        createNumberButtons()
+        makeNumberButtons()
         configureResultLabel()
         configureButtonsStack()
     }
     
-    private func createNumberButtons() {
+    private func makeNumberButtons() {
         for number in 0...9 {
             let button = ViewController.makeInputButton(for: "\(number)")
             numberButtons.append(button)

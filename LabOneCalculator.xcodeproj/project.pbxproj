@@ -9,6 +9,7 @@
 /* Begin PBXBuildFile section */
 		963BE9213317208F0232A517 /* Pods_LabOneCalculator.framework in Frameworks */ = {isa = PBXBuildFile; fileRef = 1938171144890DD1AC2ABBF3 /* Pods_LabOneCalculator.framework */; };
 		BE35ADF72592424100A6CAF7 /* Input.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE35ADF62592424000A6CAF7 /* Input.swift */; };
+		BE4D2C6B2595E4E400CBE0D6 /* Constants.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE4D2C6A2595E4E400CBE0D6 /* Constants.swift */; };
 		BE8C8020258B221600678D3C /* AppDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8C801F258B221600678D3C /* AppDelegate.swift */; };
 		BE8C8022258B221600678D3C /* SceneDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8C8021258B221600678D3C /* SceneDelegate.swift */; };
 		BE8C8024258B221600678D3C /* ViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = BE8C8023258B221600678D3C /* ViewController.swift */; };
@@ -21,6 +22,7 @@
 		1938171144890DD1AC2ABBF3 /* Pods_LabOneCalculator.framework */ = {isa = PBXFileReference; explicitFileType = wrapper.framework; includeInIndex = 0; path = Pods_LabOneCalculator.framework; sourceTree = BUILT_PRODUCTS_DIR; };
 		1D449E24663BAD9CA9F8A944 /* Pods-LabOneCalculator.release.xcconfig */ = {isa = PBXFileReference; includeInIndex = 1; lastKnownFileType = text.xcconfig; name = "Pods-LabOneCalculator.release.xcconfig"; path = "Target Support Files/Pods-LabOneCalculator/Pods-LabOneCalculator.release.xcconfig"; sourceTree = "<group>"; };
 		BE35ADF62592424000A6CAF7 /* Input.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Input.swift; sourceTree = "<group>"; };
+		BE4D2C6A2595E4E400CBE0D6 /* Constants.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Constants.swift; sourceTree = "<group>"; };
 		BE8C801C258B221600678D3C /* LabOneCalculator.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = LabOneCalculator.app; sourceTree = BUILT_PRODUCTS_DIR; };
 		BE8C801F258B221600678D3C /* AppDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = AppDelegate.swift; sourceTree = "<group>"; };
 		BE8C8021258B221600678D3C /* SceneDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = SceneDelegate.swift; sourceTree = "<group>"; };
@@ -77,6 +79,7 @@
 				BE8C801F258B221600678D3C /* AppDelegate.swift */,
 				BE8C8021258B221600678D3C /* SceneDelegate.swift */,
 				BE8C8023258B221600678D3C /* ViewController.swift */,
+				BE4D2C6A2595E4E400CBE0D6 /* Constants.swift */,
 				BE35ADF62592424000A6CAF7 /* Input.swift */,
 				BE8C8025258B221600678D3C /* Main.storyboard */,
 				BE8C8028258B221A00678D3C /* Assets.xcassets */,
@@ -208,6 +211,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				BE4D2C6B2595E4E400CBE0D6 /* Constants.swift in Sources */,
 				BE8C8024258B221600678D3C /* ViewController.swift in Sources */,
 				BE8C8020258B221600678D3C /* AppDelegate.swift in Sources */,
 				BE35ADF72592424100A6CAF7 /* Input.swift in Sources */,
