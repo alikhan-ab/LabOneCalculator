@@ -16,48 +16,18 @@ struct Input: CustomStringConvertible {
     
     private var stringInteger = "0"
     private var stringNonInteger: String?
-    
-    private var integer: Int = 0
-    private var nonInteger: Int?
     private(set) var isDecimalMode = false
     private var isNegative = false
     
-    private var decimal: Decimal?
-    
-    
-    init() {}
-    
-    init(decimal: Decimal) {
-        
-        if decimal.sign == .minus {
-            isNegative = true
-        }
-        
-        let exponent = decimal.exponent
-        if exponent < 0 {
-            isDecimalMode = true
-        }
-        
-        let significand = decimal.significand
-        
+    private var currentDouble: Double {
+        return getCurrentDouble()
     }
-
+    
     
     /// Counts how many usable digits are in the input
     func countDigits() -> Int {
-        
-        
         let integerCount = stringInteger.count
         let nonIntegerCount = stringNonInteger?.count ?? 0
-        
-        
-        var digitCount = String(integer).count
-        if let nonInteger = nonInteger {
-            digitCount += String(nonInteger).count
-        }
-        if integer < 0 {
-            digitCount -= 1
-        }
     
         return integerCount + nonIntegerCount
     }
@@ -67,8 +37,6 @@ struct Input: CustomStringConvertible {
     /// - parameters:
     ///     - integer: integer to add to the integer part of the Input
     mutating func append(integer: Int) {
-        self.integer = self.integer * 10 + integer
-        
         if stringInteger == "0" && integer != 0 {
             stringInteger = "\(integer)"
         } else if stringInteger != "0"{
@@ -80,8 +48,6 @@ struct Input: CustomStringConvertible {
     /// - parameters:
     ///     - nonInteger: integer to add to the non-integer part of the Input
     mutating func append(nonInteger: Int) {
-        self.nonInteger = (self.nonInteger ?? 0) * 10 + nonInteger
-        
         stringNonInteger = (stringNonInteger ?? "") + String(nonInteger)
     }
     
@@ -96,15 +62,6 @@ struct Input: CustomStringConvertible {
     mutating func punchInDecimal() {
         let integer = Int(stringInteger)!
         let nonInteger = Int(stringNonInteger ?? "0" )!
-        
-        var exponent = stringNonInteger?.count ?? 0
-        let significand = integer * Int(pow(10.0, Double(exponent))) + nonInteger
-        let sign: FloatingPointSign = isNegative ? .minus : .plus
-        
-        exponent.negate()
-        decimal = Decimal(sign: sign, exponent: exponent, significand: Decimal(significand))
-        
-        print(decimal)
     }
     
     
@@ -122,6 +79,13 @@ struct Input: CustomStringConvertible {
 //        
 //        
 //    }
+    
+    
+    
+    private func getCurrentDouble() -> Double {
+        
+        return 123.23
+    }
     
     
     
@@ -165,3 +129,7 @@ extension String {
         }
     }
 }
+
+
+
+
