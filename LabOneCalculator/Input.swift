@@ -94,8 +94,6 @@ struct Input: CustomStringConvertible {
     // MARK: -
     
     var description: String {
-        
-        
         // TODO: - Check if the result is longer than 9 digits
         var result = ""
         
@@ -103,7 +101,9 @@ struct Input: CustomStringConvertible {
             result.append("-")
         }
         
-        result.append(stringInteger)
+        
+    
+        result.append(stringInteger.group())
         
         if isDecimalMode {
             result.append(",")
@@ -116,17 +116,31 @@ struct Input: CustomStringConvertible {
 }
 
 
-extension String {
-    
-    func countWithoutTrailingZeros() -> Int {
+//extension String {
+//
+//    func countWithoutTrailingZeros() -> Int {
+//
+//        var tempString = self
+//
+//        while true {
+//            if tempString.last == "0" {
+//                tempString.dropLast()
+//            }
+//        }
+//    }
+//}
+
+
+extension String
+{
+    func group(by groupSize:Int=3, separator:String=" ") -> String
+    {
+        if self.count <= groupSize   { return self }
         
-        var tempString = self
+        let splitSize = count - groupSize
+        let splitIndex = index(startIndex, offsetBy: splitSize)
         
-        while true {
-            if tempString.last == "0" {
-                tempString.dropLast()
-            }
-        }
+        return String(self[..<splitIndex]).group() + separator + String(self[splitIndex...])
     }
 }
 
