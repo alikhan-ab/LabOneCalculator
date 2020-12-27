@@ -24,7 +24,8 @@ enum Colors {
     static let operationButtonTitleSelectedHighlightedColor = UIColor()
     
     static let operationButtonNormalColor = UIColor(red: 0.9882352941, green: 0.6235294118, blue: 0.168627451, alpha: 1)
-    static let operationButtonSelectedColor = UIColor()
-    static let operationButtonNormalHighlightedColor = UIColor()
-    static let operationButtonSelectedHighlightedColor = UIColor()
+    static let operationButtonSelectedColor = UIColor(red: 0.9647058824, green: 0.9647058824, blue: 0.9647058824, alpha: 1)
+    static let operationButtonNormalHighlightedColor = UIColor(red: 247/255, green: 199/255, blue: 88/255, alpha: 1)
+    static let operationButtonSelectedHighlightedColor = UIColor(red: 247/255, green: 199/255, blue: 88/255, alpha: 1)
+    
 }
