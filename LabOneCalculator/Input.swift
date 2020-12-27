@@ -19,8 +19,20 @@ struct Input: CustomStringConvertible {
     private(set) var isDecimalMode = false
     private var isNegative = false
     
-    private var currentDouble: Double {
-        return getCurrentDouble()
+    private var currentDouble: Double?
+    
+    internal init(stringInteger: String = "0", stringNonInteger: String? = nil, isDecimalMode: Bool = false, isNegative: Bool = false, currentDouble: Double? = nil) {
+        self.stringInteger = stringInteger
+        self.stringNonInteger = stringNonInteger
+        self.isDecimalMode = isDecimalMode
+        self.isNegative = isNegative
+        self.currentDouble = currentDouble
+    }
+    
+    
+    init(currentDouble: Double) {
+        self.init()
+        self.currentDouble = currentDouble
     }
     
     
@@ -53,83 +65,102 @@ struct Input: CustomStringConvertible {
     
     mutating func negate() {
         isNegative = !isNegative
+        currentDouble?.negate()
     }
     
     mutating func enterDecimalMode() {
         isDecimalMode = true
     }
     
-    mutating func punchInDecimal() {
-        let integer = Int(stringInteger)!
-        let nonInteger = Int(stringNonInteger ?? "0" )!
-    }
+//    mutating func punchInDouble() {
+//        let integer = Int(stringInteger)!
+//        let nonInteger = Int(stringNonInteger ?? "0" )!
+//
+//        currentDouble = getCurrentDouble()
+//    }
     
     
     // MARK: - Arithmetical Operations
     
-//    func add(input: Input) -> Input {
-//        return decimal + input.decimal
-//    }
-    
-    
-//    func percent() -> Input {
-//        
-//        
-//        
-//        
-//        
-//    }
-    
-    
-    
-    private func getCurrentDouble() -> Double {
+    func add(input: Input) -> Input? {
         
-        return 123.23
+        guard let currentDouble = getCurrentDouble() else { return Input(currentDouble: .nan)}
+        guard let inputDouble = input.getCurrentDouble() else { return Input(currentDouble: .nan)}
+        
+        return Input(currentDouble: currentDouble + inputDouble)
     }
     
+    func subtract(input: Input) -> Input? {
+        
+        guard let currentDouble = getCurrentDouble() else { return Input(currentDouble: .nan)}
+        guard let inputDouble = input.getCurrentDouble() else { return Input(currentDouble: .nan)}
+        
+        return Input(currentDouble: currentDouble - inputDouble)
+    }
     
+    func multiply(by input: Input) -> Input? {
+        guard let currentDouble = getCurrentDouble() else { return Input(currentDouble: .nan)}
+        guard let inputDouble = input.getCurrentDouble() else { return Input(currentDouble: .nan)}
+        
+        return Input(currentDouble: currentDouble * inputDouble)
+    }
     
+    func divide(by input: Input) -> Input? {
+        guard let currentDouble = getCurrentDouble() else { return Input(currentDouble: .nan)}
+        guard let inputDouble = input.getCurrentDouble() else { return Input(currentDouble: .nan)}
+        
+        return Input(currentDouble: currentDouble / inputDouble)
+    }
     
+    private func getCurrentDouble() -> Double? {
+        if currentDouble != nil {
+            return currentDouble
+        } else {
+            return Double(stringSign+stringInteger + "." + (stringNonInteger ?? "0"))
+        }
+    }
     
     // MARK: -
     
     var description: String {
-        // TODO: - Check if the result is longer than 9 digits
-        var result = ""
+        if currentDouble != nil {
+            return getDescriptionFromDouble()
+        } else {
+            return getDescriptionFromString()
+        }
+    }
+    
+    private func getDescriptionFromDouble() -> String {
+        guard let currentDouble = currentDouble else { return "Error" }
         
+        let numberForamtter = NumberFormatter()
+        numberForamtter.locale = .current
+        
+        if abs(currentDouble) > 999_999_999  || abs(currentDouble) < 0.000_000_01 {
+            numberForamtter.numberStyle = .scientific
+        } else {
+            numberForamtter.numberStyle = .decimal
+        }
+    
+        numberForamtter.maximumSignificantDigits = 9
+        return numberForamtter.string(for: currentDouble) ?? "Error"
+    }
+    
+    
+    private func getDescriptionFromString() -> String {
+        var result = ""
         if isNegative {
             result.append("-")
         }
-        
-        
-    
         result.append(stringInteger.group())
         
         if isDecimalMode {
             result.append(",")
             result.append(stringNonInteger ?? "")
         }
-        
-        
         return result
     }
 }
-
-
-//extension String {
-//
-//    func countWithoutTrailingZeros() -> Int {
-//
-//        var tempString = self
-//
-//        while true {
-//            if tempString.last == "0" {
-//                tempString.dropLast()
-//            }
-//        }
-//    }
-//}
-
 
 extension String
 {
@@ -140,10 +171,8 @@ extension String
         let splitSize = count - groupSize
         let splitIndex = index(startIndex, offsetBy: splitSize)
         
-        return String(self[..<splitIndex]).group() + separator + String(self[splitIndex...])
+        return String(self[..<splitIndex]).group()
+            + separator
+            + String(self[splitIndex...])
     }
 }
-
-
-
-
